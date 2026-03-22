@@ -1,89 +1,53 @@
-### Descripción del Proyecto
+**EnredaArte - E-commerce de Joyería Artesanal**
+**Hito 2:** Estado Global con Context API y Panel de Administración
+Este proyecto es una plataforma de comercio electrónico desarrollada con React, diseñada para gestionar la venta de joyas hechas a mano. En este segundo hito, nos enfocamos en la implementación de un estado global para manejar el carrito, los favoritos y un panel administrativo funcional.
 
-Este proyecto consiste en el desarrollo de un Marketplace especializado para **EnredaArte**, un emprendimiento de joyería artesanal en alambrismo de cobre y cristales. La aplicación permite a los usuarios navegar por un catálogo de piezas únicas, gestionar un carrito de compras y, para la administración, controlar el inventario de la tienda.
+**Funcionalidades Implementadas**
+### 1. Gestión de Estado Global (Context API)
+Se implementó ProductContext para centralizar la información de la tienda, permitiendo que cualquier componente acceda a:
 
-# Requerimiento 1
-### 🖥️ Vistas del proyecto
-Visitar el siguiente link para visualizar las diferentes vistas https://www.figma.com/design/gokS8qpRhqHXL3dknH3Dsp/Ecommerce-Website-Wireframe--Community-?node-id=102-379&p=f&t=2jgSpXeO4omyPrHD-0
+Catálogo de productos: Lista dinámica de joyas con sus detalles.
 
-Se ha diseñado el prototipo funcional de la aplicación, definiendo la estructura y los elementos clave de cada pantalla para asegurar una navegación fluida entre el catálogo y el proceso de compra.
+Carrito de compras: Funciones para añadir, actualizar cantidades y calcular totales.
 
-Componentes Prototipados:
+Sistema de Favoritos: Posibilidad de marcar joyas deseadas desde cualquier vista.
 
-- **Página Principal**: Vista de bienvenida con la identidad de marca, destacando las colecciones de joyería artesanal y el acceso a la tienda.
+### 2. Panel de Administración (Admin Panel) 🛠️
+Una sección exclusiva para la gestión del negocio que incluye:
 
-- **Registro de Usuarios**: Formulario para capturar los datos de nuevos clientes (nombre, email, teléfono).
+Inventario: Visualización de stock y precios en tiempo real.
 
-- **Inicio de Sesión**: Interfaz de acceso para usuarios registrados y validación de administrador.
+Agregar Productos: Formulario integrado para dar de alta nuevas creaciones.
 
-- **Mi Perfil**: Espacio personal donde el cliente puede ver sus datos y su lista de joyas favoritas.
+Gestión de Usuarios: Visualización de la comunidad registrada.
 
-- **Galería de Publicaciones (Tienda)**: Catálogo dinámico donde se muestran todas las piezas de alambrismo disponibles.
+Reporte de Ventas: Resumen de ingresos y pedidos realizados.
 
-- **Vista de Detalle de una Publicación**: Pantalla específica con la descripción técnica de la joya (piedra, color, stock) y botones de acción.
+### 3. Experiencia de Usuario (UX)
+Navegación Intuitiva: Uso de react-router-dom para transiciones fluidas.
 
-- **Carrito de Compras**: Interfaz de revisión donde el usuario gestiona las cantidades de los productos seleccionados.
+Feedback Visual: Integración de SweetAlert2 para confirmar acciones (agregar al carrito, guardar producto, etc.).
 
-- **Confirmación de Compra**: Paso final para procesar el pedido y generar el registro en la base de datos.
+Diseño Responsivo: Interfaz adaptada para escritorio y dispositivos móviles usando Bootstrap.
 
-- **Formulario para crear una publicación (Privado)**: Panel exclusivo para la administración, diseñado para subir nuevas piezas al catálogo con sus especificaciones técnicas.
+## Tecnologías Utilizadas
+React.js: Biblioteca principal para la interfaz.
 
-# Requerimiento 2
+Context API: Manejo del estado global sin prop-drilling.
 
-### 🚪 Navegación y Roles de Acceso
-(Archivo Diagrama de Vistas en la carpeta ***/documentation***)
+Bootstrap 5: Framework de estilos para un diseño limpio y rápido.
 
-El sistema implementa una lógica de rutas protegidas para diferenciar las capacidades de los usuarios:
+SweetAlert2: Alertas interactivas y estéticas.
 
-1. **Vistas Públicas:** Acceso libre a la Página Principal, Galería de productos, Registro y Login.
+React Router Dom: Manejo de rutas y navegación.
 
-2. **Vistas Privadas (Cliente):** Requieren inicio de sesión para acceder a "Mi Perfil", "Mis Favoritos", "Carrito de compras" y "Confirmación de compras".
+## Instalación y Uso
 
-3. **Vistas Privadas (Administrador):** Acceso exclusivo a la Gestión de inventario, Lista de usuarios registrados y Gestión de ventas.
+Clonar el repositorio:
+git clone https://github.com/tu-usuario/enredaarte-hito2.git
 
-# Requerimiento 3
-### 🛠️ Tecnologías y Dependencias
-(Archivo Dependencias.md en la carpeta ***/documentation***)
+Instalar dependencias:
+npm install
 
-Para asegurar un desarrollo sólido en las tres capas del proyecto, se han definido las siguientes librerías:
-
-## Frontend:
-- **React & React Router DOM**: Para la creación de una interfaz dinámica y la navegación entre las vistas públicas y privadas.
-- **Context API**: Para la gestión global del **Carrito de Compras**, permitiendo que los productos persistan durante la navegación.
-- **Axios**: Para el consumo de la API del servidor.
-- **SweetAlert2**: Para notificaciones de confirmación de compra y alertas de usuario.
-- **Bootstrap**: Para un diseño responsivo y elegante acorde a la marca.
-
-## Backend:
-- **Express.js**: Framework principal para la creación de la API REST.
-- **JSON Web Token (JWT)**: Para la autenticación y diferenciación de accesos entre *Administrador* y *Cliente*.
-- **Bcryptjs**: Para la seguridad y encriptación de contraseñas de los usuarios.
-- **Dotenv & CORS**: Para la configuración de variables de entorno y permisos de conexión entre capas.
-
-## Database:
-- **PostgreSQL**: Sistema de gestión de base de datos relacional para el almacenamiento de joyas y pedidos.
-- **PG**: Driver para conectar Node.js con la base de datos.
-
-# Requerimiento 4
-### 🗄️ Modelo de Datos 
-(Archivo Esquema de base de datos en la carpeta ***/documentation***)
-
-Se han diseñado tablas relacionadas para soportar el flujo comercial:
-
-- **Users**: Incluye el campo `role` para definir permisos.
-- **Products**: Detalla las joyas (material, piedra, precio, stock).
-- **Orders**: Registra las compras confirmadas desde el carrito.
-- **Favorites**: Permite a los clientes guardar sus piezas preferidas.
-
-# Requerimiento 5
-### 📄 Contrato de Datos de la API REST
-(Archivo API_REFERENCES.md en la carpeta ***/documentation***)
-
-Se ha definido un contrato de datos detallado que establece la estructura de los objetos JSON para la comunicación entre el Frontend y el Backend. Este contrato asegura que las peticiones coincidan con el Esquema de Base de Datos de EnredaArte:
-
-
-- **Autenticación** Estructura para el registro y login, incluyendo el manejo de Tokens JWT y la devolución del rol de usuario (admin/user).
-
-- **Gestión de Productos**: Formatos para listar el catálogo y permitir que la administradora agregue nuevas joyas (incluyendo campos de material, piedra y stock).
-
-- **Flujo del Carrito**: Definición del objeto para la Confirmación de Compra, vinculando el ID del usuario con el total y la fecha de la orden.
+Ejecutar el proyecto:
+npm run dev
