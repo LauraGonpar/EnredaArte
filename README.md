@@ -1,4 +1,5 @@
-**EnredaArte - E-commerce de Joyería Artesanal**
+# EnredaArte - E-commerce de Joyería Artesanal
+
 **Hito 2:** Estado Global con Context API y Panel de Administración
 Este proyecto es una plataforma de comercio electrónico desarrollada con React, diseñada para gestionar la venta de joyas hechas a mano. En este segundo hito, nos enfocamos en la implementación de un estado global para manejar el carrito, los favoritos y un panel administrativo funcional.
 
