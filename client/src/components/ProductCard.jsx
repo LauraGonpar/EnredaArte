@@ -4,20 +4,18 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 const ProductCard = ({ product }) => {
-  // Extraemos todo lo necesario del Contexto
   const { addToCart, imagenesMapa, toggleFavorite, user } = useContext(ProductContext);
   const navigate = useNavigate();
 
-  // 1. Verificación de seguridad: Si no hay producto, no renderizamos nada
   if (!product) return null;
 
   const handleFavoriteClick = (e) => {
-    e.stopPropagation(); // Evita que el clic nos mande al detalle
+    e.stopPropagation(); 
     toggleFavorite(product);
   };
 
   const handleAdd = (e) => {
-    e.stopPropagation(); // Evita que el clic nos mande al detalle
+    e.stopPropagation(); 
     addToCart(product);
     Swal.fire({
       title: "¡Agregado!",
@@ -30,7 +28,6 @@ const ProductCard = ({ product }) => {
   return (
     <div className="card h-100 shadow-sm border-0 product-card-hover position-relative bg-white">
       
-      {/* BOTÓN "FAV" */}
       {user && (
         <button
       className="btn btn-sm position-absolute top-0 end-0 m-3 px-3 py-1 fw-bold border border-dark bg-light text-dark shadow-sm" onClick={handleFavoriteClick} style={{ zIndex: 10, borderRadius: '50px', fontSize: '0.8rem', width: '40px', height: '40px',display:'flex',  alignItems: 'center', justifyContent: 'center' }}
@@ -38,7 +35,6 @@ const ProductCard = ({ product }) => {
 </button>
       )}
 
-      {/* ÁREA DE IMAGEN Y DETALLES (Clickeable) */}
       <div onClick={() => navigate(`/producto/${product.id}`)} style={{ cursor: 'pointer' }}>
         <img 
           src={imagenesMapa[product.id]} 
@@ -48,24 +44,20 @@ const ProductCard = ({ product }) => {
         />
         
         <div className="card-body d-flex flex-column">
-          {/* TÍTULO */}
           <h6 className="fw-bold text-enredarte-red mb-1" style={{ fontSize: '1.1rem' }}>
             {product.nombre || "Producto EnredaArte"}
           </h6>
           
-          {/* DESCRIPCIÓN */}
           <p className="text-muted small flex-grow-1 mb-2" style={{ fontSize: '0.8rem' }}>
             {product.descripcion}
           </p>
           
-          {/* PRECIO: Usamos rango_precio o el precio normal formateado */}
           <p className="fw-bold text-enredarte-red mb-3">
             {product.rango_precio || `$${product.precio?.toLocaleString('es-CL')}`}
           </p>
         </div>
       </div>
 
-      {/* BOTONES DE ACCIÓN (Fuera del div de navegación para evitar conflictos) */}
       <div className="card-footer bg-white border-0 pt-0 pb-3 px-3">
         <div className="d-flex gap-2">
           <button 

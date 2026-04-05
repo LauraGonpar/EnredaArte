@@ -1,56 +1,61 @@
-import { Link, useNavigate } from "react-router-dom"; 
-import { useContext, useState } from "react"; 
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
 import { ProductContext } from "../context/ProductContext";
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 
 const Login = () => {
-  const { setUser } = useContext(ProductContext);
+
+  const { login } = useContext(ProductContext); 
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (email === "admin@enredaarte.cl" && password === "admin123") {
-    setUser({
-      id: 99,
-      nombre: "Laura Gonzalez",
-      email: "admin@enredaarte.cl",
-      role: "admin"
-    });
-    Swal.fire("¡Bienvenida Laura!", "Panel de control activado", "success");
-    navigate("/admin"); 
-  } 
-  
+    try {
+      const response = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+     
+const data = await response.json();
+      if (response.ok) {
+        login(data.token, data.user); 
 
-  else if (email === "usuario@gmail.com" && password === "123456") {
-    setUser({
-      id: 1,
-      nombre: "Lola Pérez",
-      email: "usuario@gmail.com",
-      role: "user"
-    });
-    Swal.fire("¡Hola Lola!", "Qué bueno verte de nuevo", "success");
-    navigate("/"); 
-  } 
-  
-  else {
-    Swal.fire("Error", "Credenciales no reconocidas", "error");
-  }
+        Swal.fire({
+          title: `¡Bienvenid@ ${data.user.nombre}!`,
+          text: "Has ingresado correctamente",
+          icon: "success",
+          confirmButtonColor: "#b38e6d"
+        });
+
+        if (data.user.rol === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+
+      } else {
+        Swal.fire("Error", data.message || "Credenciales incorrectas", "error");
+      }
+    } catch (error) {
+      console.error("Error en el login:", error);
+      Swal.fire("Error", "No se pudo conectar con el servidor", "error");
+    }
   };
 
   return (
     <div className="container-fluid vh-100 d-flex p-0 shadow-lg overflow-hidden rounded-4 mt-5">
       <div className="col-md-5 bg-enredarte-red d-flex flex-column justify-content-center align-items-center text-white p-5">
-        <h1 className="display-5 fw-bold mb-4">Bienvenid@ a EnredaArte</h1>
-        <p className="text-center opacity-75 mb-5">Joyería artesanal con alma de cobre y cristales.</p>
+        <h1 className="display-5 fw-bold mb-4">EnredaArte</h1>
+        <p className="text-center opacity-75 mb-5">Tu portal a la joyería artesanal.</p>
       </div>
 
       <div className="col-md-7 bg-enredarte-cream d-flex flex-column justify-content-center p-5">
         <h2 className="fw-bold mb-4">Bienvenido de vuelta</h2>
-        
 
         <form onSubmit={handleSubmit} style={{ maxWidth: "400px" }}>
           <div className="mb-3">
@@ -58,8 +63,9 @@ const Login = () => {
             <input 
               type="email" 
               className="form-control border-0 py-2 shadow-sm"
-              placeholder="ingresa tu E-mail"
+              placeholder="tu@email.com"
               value={email}
+              autoComplete="username"
               onChange={(e) => setEmail(e.target.value)}
               required
             />
@@ -69,8 +75,9 @@ const Login = () => {
             <input 
               type="password" 
               className="form-control border-0 py-2 shadow-sm" 
-              placeholder="ingresa tu contraseña"
+              placeholder="Ingresa tu clave"
               value={password}
+              autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)} 
               required
             />
@@ -79,7 +86,7 @@ const Login = () => {
             Confirmar
           </button>
           <p className="text-center small">
-            ¿No tienes cuenta aún? <Link to="/registro" className="fw-bold text-dark">Registrate</Link>
+            ¿No tienes cuenta aún? <Link to="/registro" className="fw-bold text-dark">Regístrate</Link>
           </p>
         </form>
       </div>

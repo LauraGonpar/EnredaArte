@@ -1,10 +1,35 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react"; 
 import { ProductContext } from "../context/ProductContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 
 const Tienda = () => {
   const { products, imagenesMapa, addToCart, toggleFavorite, user } = useContext(ProductContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const [productosFiltrados, setProductosFiltrados] = useState([]);
+
+  const queryParams = new URLSearchParams(location.search);
+  const categoriaSeleccionada = queryParams.get("categoria");
+
+  useEffect(() => {
+    if (categoriaSeleccionada) {
+      const filtrados = products.filter(
+        (p) => p.categoria?.toLowerCase() === categoriaSeleccionada.toLowerCase()
+      );
+      setProductosFiltrados(filtrados);
+    } else {
+      setProductosFiltrados(products);
+    }
+  }, [categoriaSeleccionada, products]);
+
+  const manejarFiltroClick = (cat) => {
+    if (cat === "Todas") {
+      navigate("/Tienda");
+    } else {
+      navigate(`/Tienda?categoria=${cat.toLowerCase()}`);
+    }
+  };
 
   return (
     <div className="container-fluid bg-enredarte-cream pt-5 mt-5 min-vh-100 px-5">
@@ -16,15 +41,18 @@ const Tienda = () => {
           </p>
           <h5 className="fw-bold text-enredarte-red mb-3">Filtros</h5>
           <div className="filter-section">
-            <p className="fw-bold small mb-2">Categorias</p>
-            {["Aros", "Pulseras", "Negro", "Fucsia"].map((cat) => (
+            <p className="fw-bold small mb-2">Categorías</p>
+            {["Todas", "Aros", "Pulseras", "Collares"].map((cat) => (
               <div key={cat} className="form-check mb-2">
                 <input
                   className="form-check-input shadow-sm border-dark"
-                  type="checkbox"
+                  type="radio" 
+                  name="categoriaFiltro"
                   id={cat}
+                  checked={categoriaSeleccionada === cat.toLowerCase() || (cat === "Todas" && !categoriaSeleccionada)}
+                  onChange={() => manejarFiltroClick(cat)}
                 />
-                <label className="form-check-label small" htmlFor={cat}>
+                <label className="form-check-label small" htmlFor={cat} style={{ cursor: 'pointer' }}>
                   {cat}
                 </label>
               </div>
@@ -35,12 +63,20 @@ const Tienda = () => {
         <div className="col-md-10">
           <div className="d-flex justify-content-between align-items-center mb-4">
             <span className="small text-muted">
-              Showing {products.length} Products
+              Mostrando {productosFiltrados.length} Diseños de EnredaArte
             </span>
+            {categoriaSeleccionada && (
+              <button 
+                className="btn btn-link text-enredarte-red btn-sm text-decoration-none"
+                onClick={() => navigate("/Tienda")}
+              >
+                Limpiar filtros x
+              </button>
+            )}
           </div>
 
           <div className="row g-4">
-            {products.map((p) => (
+            {productosFiltrados.map((p) => (
               <div key={p.id} className="col-md-4">
                 <div className="card border-0 bg-transparent h-100 product-card-tienda position-relative">
                   <div className="image-container-wrapper position-relative">
@@ -66,10 +102,7 @@ const Tienda = () => {
                       </button>
                     )}
 
-                    <Link
-                      to={`/producto/${p.id}`}
-                      className="text-decoration-none"
-                    >
+                    <Link to={`/producto/${p.id}`} className="text-decoration-none">
                       <div
                         className="image-container shadow-sm mb-3 bg-white"
                         style={{
@@ -80,7 +113,7 @@ const Tienda = () => {
                         }}
                       >
                         <img
-                          src={imagenesMapa[p.id]}
+                          src={p.imagen || imagenesMapa[p.id] || "https://img.freepik.com/vector-premium/joyeria-logotipo-alambrismo-cristales_605054-12.jpg"}
                           className="card-img-top img-fluid w-100 h-100 object-fit-cover transition-zoom"
                           alt={p.nombre}
                         />
@@ -89,19 +122,16 @@ const Tienda = () => {
                   </div>
 
                   <div className="ps-1">
-                    <h6
-                      className="fw-bold text-enredarte-red mb-1"
-                      style={{ fontSize: "1.1rem" }}
-                    >
+                    <h6 className="fw-bold text-enredarte-red mb-1" style={{ fontSize: "1.1rem" }}>
                       {p.nombre}
                     </h6>
                     <p className="small text-enredarte-red opacity-75 fw-medium mb-3">
-                      {p.rango_precio}
+                      ${Number(p.precio || 0).toLocaleString('es-CL')}
                     </p>
 
                     <div className="d-flex gap-2 mb-4">
                       <button
-                        className="btn btn-outline-enredarte btn-sm flex-grow-1 fw-bold"
+                        className="btn btn-brown btn-sm flex-grow-1 fw-bold text-white"
                         onClick={() => navigate(`/producto/${p.id}`)}
                       >
                         Detalle
@@ -118,6 +148,16 @@ const Tienda = () => {
               </div>
             ))}
           </div>
+
+          {productosFiltrados.length === 0 && (
+            <div className="text-center my-5 p-5 bg-white rounded shadow-sm">
+              <h4>No encontramos productos en esta categoría</h4>
+              <p>Pronto subiremos nuevos diseños. ¡Sigue explorando!</p>
+              <button className="btn btn-brown text-white" onClick={() => navigate("/Tienda")}>
+                Ver todo el catálogo
+              </button>
+            </div>
+          )}
 
           <div className="text-center my-5">
             <button className="btn btn-outline-dark px-5 py-2 fw-bold bg-enredarte-cream">

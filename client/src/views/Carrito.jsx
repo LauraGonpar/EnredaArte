@@ -4,60 +4,110 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
 const Carrito = () => {
-  const { cart, updateQuantity, removeFromCart, cartTotal } = useContext(ProductContext);
-const navigate = useNavigate();
-  const handleFinalizarCompra = () => {
+  const { cart, updateQuantity, removeFromCart, cartTotal, token,  imagenesMapa } = useContext(ProductContext);
+  const navigate = useNavigate();
+
+  const totalSeguro = Number(cartTotal) || 0;
+
+  const handleFinalizarCompra = async () => {
     if (cart.length === 0) {
-      Swal.fire("Carrito vacío", "Agrega algunos productos antes de comprar", "warning");
+      Swal.fire("Carrito vacío", "Agrega algunas joyas de EnredaArte antes de comprar", "warning");
       return;
     }
-    navigate("/checkout");
+
+    if (!token) {
+      Swal.fire("Inicia Sesión", "Debes estar logueado para finalizar tu compra", "info");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` 
+        },
+        body: JSON.stringify({
+          productos: cart,
+          total: totalSeguro,
+        }),
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          title: "¡Completa los datos!",
+          text: "Agrega los datos de tu tarjeta para finalizar la compra",
+          
+          confirmButtonColor: "#b38e6d",
+        });
+       
+        navigate("/checkout"); 
+      } else {
+        Swal.fire("Error", "No pudimos procesar tu pedido", "error");
+      }
+    } catch (error) {
+      console.error("Error en la compra:", error);
+      Swal.fire("Error", "El servidor de EnredaArte no responde", "error");
+    }
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Tu Carrito de Compras 🧶</h2>
+    <div className="container mt-5 pt-5 min-vh-100">
+      <h2 className="mb-4 fw-bold text-dark">Tu Carrito de Compras 🧶</h2>
       
       <div className="row">
         <div className="col-lg-8">
           {cart.length === 0 ? (
             <div className="alert alert-light border shadow-sm p-5 text-center">
               <h4>Tu carrito está vacío</h4>
-              <p>¡Nuestras joyas de alambrismo te están esperando!</p>
+              <p>¡Nuestras joyas artesanales te están esperando!</p>
+              <button className="btn btn-brown text-white mt-3" onClick={() => navigate("/tienda")}>
+                Ir a la Tienda
+              </button>
             </div>
           ) : (
-            <div className="card shadow-sm">
+            <div className="card shadow-sm border-0">
               <ul className="list-group list-group-flush">
                 {cart.map((item) => (
                   <li key={item.id} className="list-group-item py-3">
                     <div className="row align-items-center">
                       <div className="col-2">
-                        <img src={item.imagen_url} alt={item.nombre} className="img-fluid rounded" />
+                        <img 
+                          src={item.imagen || imagenesMapa[item.id] || "https://img.freepik.com/vector-premium/joyeria-logotipo-alambrismo-cristales_605054-12.jpg"} 
+                          alt={item.nombre} 
+                          className="img-fluid rounded shadow-sm" 
+                          style={{ height: "80px", objectFit: "cover", width: "100%" }}
+                        />
                       </div>
                       <div className="col-4">
-                        <h6 className="mb-0">{item.nombre}</h6>
-                        <small className="text-muted">Color: {item.color}</small>
+                        <h6 className="mb-0 fw-bold">{item.nombre}</h6>
+                        <small className="text-muted">{item.color || "Pieza única"}</small>
                       </div>
                       <div className="col-3 d-flex align-items-center">
                         <button 
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => updateQuantity(item.id, Math.max(1, item.cantidad - 1))}
+                          className="btn btn-sm btn-outline-dark"
+                          onClick={() => updateQuantity(item.id, Math.max(1, (Number(item.count) || 1) - 1))}
                         > - </button>
-                        <span className="mx-3 fw-bold">{item.cantidad}</span>
+                        
+                        <span className="mx-3 fw-bold">{item.count || 1}</span>
+                        
                         <button 
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => updateQuantity(item.id, Math.min(item.stock, item.cantidad + 1))}
+                          className="btn btn-sm btn-outline-dark"
+                          onClick={() => updateQuantity(item.id, (Number(item.count) || 1) + 1)}
                         > + </button>
                       </div>
                       <div className="col-2 text-end">
-                        <span className="fw-bold">${(item.precio * item.cantidad).toLocaleString()}</span>
+                        <span className="fw-bold">
+                          ${(Number(item.precio || 0) * (Number(item.count) || 1)).toLocaleString("es-CL")}
+                        </span>
                       </div>
-                      <div className="col-1">
+                      <div className="col-1 text-center">
                         <button 
                           className="btn btn-link text-danger p-0"
                           onClick={() => removeFromCart(item.id)}
                         >
-                          <i className="bi bi-trash"></i> Eliminar
+                          <i className="bi bi-trash fs-5"></i>
                         </button>
                       </div>
                     </div>
@@ -69,23 +119,28 @@ const navigate = useNavigate();
         </div>
 
         <div className="col-lg-4">
-          <div className="card shadow-sm border-warning">
+          <div className="card shadow-sm border-0 bg-light p-3">
             <div className="card-body">
-              <h5 className="card-title mb-4">Resumen de Compra</h5>
+              <h5 className="card-title fw-bold mb-4 text-center">Resumen de Compra</h5>
               <div className="d-flex justify-content-between mb-2">
                 <span>Subtotal</span>
-                <span>${cartTotal.toLocaleString()}</span>
+                <span>${totalSeguro.toLocaleString("es-CL")}</span>
               </div>
               <div className="d-flex justify-content-between mb-4 border-top pt-2">
                 <span className="fw-bold fs-5">Total</span>
-                <span className="fw-bold fs-5 text-warning">${cartTotal.toLocaleString()}</span>
+                <span className="fw-bold fs-5 text-enredarte-red">
+                  ${totalSeguro.toLocaleString("es-CL")}
+                </span>
               </div>
               <button 
-                className="btn btn-warning w-100 fw-bold"
+                className="btn btn-brown w-100 py-2 fw-bold text-white shadow-sm"
                 onClick={handleFinalizarCompra}
               >
-                PAGAR AHORA
+                FINALIZAR COMPRA
               </button>
+              <p className="text-center small text-muted mt-3">
+                Pagos seguros vía EnredaArte Store
+              </p>
             </div>
           </div>
         </div>

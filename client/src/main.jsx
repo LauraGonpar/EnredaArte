@@ -7,7 +7,7 @@ import './index.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { BrowserRouter } from 'react-router-dom';
 
-import { ProductProvider } from './context/ProductContext.jsx';
+import  ProductProvider  from './context/ProductContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

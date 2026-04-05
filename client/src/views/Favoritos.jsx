@@ -4,10 +4,9 @@ import ProductCard from "../components/ProductCard";
 import { Link } from "react-router-dom";
 
 const Favoritos = () => {
-  const { favorites } = useContext(ProductContext);
+  const { favorites = [] } = useContext(ProductContext);
 
   return (
-    // Agregamos pt-5 y mt-5 para que el Navbar no tape el título
     <div className="container-fluid bg-enredarte-cream pt-5 mt-5 min-vh-100 px-lg-5">
       <div className="container py-4">
         <div className="text-center mb-5">
@@ -24,11 +23,9 @@ const Favoritos = () => {
             </Link>
           </div>
         ) : (
-          // Usamos la misma estructura de la Tienda para que se vea profesional
           <div className="row g-4">
             {favorites.map((product) => (
               <div className="col-12 col-md-6 col-lg-4" key={product.id}>
-                {/* Aquí el ProductCard ya debería mostrar nombre, precio y botones */}
                 <ProductCard product={product} />
               </div>
             ))}

@@ -4,14 +4,19 @@ import { ProductContext } from "../context/ProductContext";
 import logo from "../assets/img/logo-enredaarte.png";
 
 const Navbar = () => {
-  const { cart, user, setUser, favorites } = useContext(ProductContext);
+  const { cart, user, setUser, favorites, token, setToken } = useContext(ProductContext);
   const navigate = useNavigate();
-  const totalItems = cart.reduce((acc, item) => acc + item.cantidad, 0);
+  const totalItems = (cart || []).reduce((acc, item) => acc + (Number(item.count) || 0), 0);
 
   const handleLogout = () => {
+    if (typeof setUser === 'function') { 
     setUser(null);
+    setToken(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/");
-  };
+  }
+};
 
   return (
     <nav className="fixed-top shadow-sm">
@@ -45,7 +50,7 @@ const Navbar = () => {
               Nosotros
             </Link>
 
-            {user ? (
+            {token ? (
               <button
                 onClick={handleLogout}
                 className="btn btn-link nav-link-custom border-0 p-0 text-decoration-none"
@@ -57,7 +62,7 @@ const Navbar = () => {
                 Iniciar sesión
               </Link>
             )}
-            {user?.role === "admin" && (
+            {user?.rol === "admin" && (
               <li className="nav-item">
                 <Link
                   to="/admin"
@@ -86,12 +91,12 @@ const Navbar = () => {
                   className="nav-link text-enredarte-red ms-3 position-relative"
                 >
                   <i className="bi bi-heart-fill fs-4"></i>
-                  {favorites.length > 0 && (
+                  {favorites?.length > 0 && (
                     <span
                       className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark"
                       style={{ fontSize: "0.6rem" }}
                     >
-                      {favorites.length}
+                      {favorites?.length}
                     </span>
                   )}
                 </Link>
